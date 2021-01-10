@@ -1,7 +1,7 @@
 Maintainers
 ===========
 
-fabric-samples uses a non-author code review policy, requiring a single +2 from a non-author maintainer.
+fabric-samples uses a non-author code review policy, requiring a single approval from a non-author maintainer.
 
 | Name                      | GitHub           | Chat           | email                               |
 |---------------------------|------------------|----------------|-------------------------------------|
@@ -12,6 +12,7 @@ fabric-samples uses a non-author code review policy, requiring a single +2 from 
 | Gari Singh                | mastersingh24    | mastersingh24  | gari.r.singh@gmail.com              |
 | Jason Yellick             | jyellick         | jyellick       | jyellick@us.ibm.com                 |
 | Matthew B White           | mbwhite          | mbwhite        | whitemat@uk.ibm.com                 |
+| Nikhil Gupta              | nikhil550        | negupta        | nikhilg550@gmail.com                |
 | Simon Stone               | sstone1          | sstone1        | sstone1@uk.ibm.com                  |
 
 Also: Please see the [Release Manager section](https://github.com/hyperledger/fabric/blob/master/MAINTAINERS.md)

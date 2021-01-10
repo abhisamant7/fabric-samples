@@ -12,7 +12,7 @@
 #
 
 echo
-echo "========= Getting Org3 on to your test network ========= "
+echo "========= Getting Dfarmclient on to your test network ========= "
 echo
 CHANNEL_NAME="$1"
 DELAY="$2"
@@ -36,7 +36,7 @@ joinChannelWithRetry() {
   set -x
   peer channel join -b $CHANNEL_NAME.block >&log.txt
   res=$?
-  set +x
+  { set +x; } 2>/dev/null
   cat log.txt
   if [ $res -ne 0 -a $COUNTER -lt $MAX_RETRY ]; then
     COUNTER=$(expr $COUNTER + 1)
@@ -52,9 +52,9 @@ joinChannelWithRetry() {
 
 echo "Fetching channel config block from orderer..."
 set -x
-peer channel fetch 0 $CHANNEL_NAME.block -o orderer.example.com:7050 --ordererTLSHostnameOverride orderer.example.com -c $CHANNEL_NAME --tls --cafile $ORDERER_CA >&log.txt
+peer channel fetch 0 $CHANNEL_NAME.block -o orderer.dfarmorderer.com:7050 --ordererTLSHostnameOverride orderer.dfarmorderer.com -c $CHANNEL_NAME --tls --cafile $ORDERER_CA >&log.txt
 res=$?
-set +x
+{ set +x; } 2>/dev/null
 cat log.txt
 verifyResult $res "Fetching config block from orderer has Failed"
 
@@ -62,7 +62,7 @@ joinChannelWithRetry 3
 echo "===================== peer0.org3 joined channel '$CHANNEL_NAME' ===================== "
 
 echo
-echo "========= Finished adding Org3 to your test network! ========= "
+echo "========= Finished adding Dfarmclient to your test network! ========= "
 echo
 
 exit 0

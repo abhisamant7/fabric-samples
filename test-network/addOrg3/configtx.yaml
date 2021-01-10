@@ -13,33 +13,33 @@
 #
 ################################################################################
 Organizations:
-    - &Org3
+    - &Dfarmclient
         # DefaultOrg defines the organization which is used in the sampleconfig
         # of the fabric.git development environment
-        Name: Org3MSP
+        Name: DfarmclientMSP
 
         # ID to load the MSP definition as
-        ID: Org3MSP
+        ID: DfarmclientMSP
 
-        MSPDir: ../organizations/peerOrganizations/org3.example.com/msp
+        MSPDir: ../organizations/peerOrganizations/dfarmclient.com/msp
 
         Policies:
             Readers:
                 Type: Signature
-                Rule: "OR('Org3MSP.admin', 'Org3MSP.peer', 'Org3MSP.client')"
+                Rule: "OR('DfarmclientMSP.admin', 'DfarmclientMSP.peer', 'DfarmclientMSP.client')"
             Writers:
                 Type: Signature
-                Rule: "OR('Org3MSP.admin', 'Org3MSP.client')"
+                Rule: "OR('DfarmclientMSP.admin', 'DfarmclientMSP.client')"
             Admins:
                 Type: Signature
-                Rule: "OR('Org3MSP.admin')"
+                Rule: "OR('DfarmclientMSP.admin')"
             Endorsement:
                 Type: Signature
-                Rule: "OR('Org3MSP.peer')"
+                Rule: "OR('DfarmclientMSP.peer')"
 
         AnchorPeers:
             # AnchorPeers defines the location of peers which can be used
             # for cross org gossip communication.  Note, this value is only
             # encoded in the genesis block in the Application section context
-            - Host: peer0.org3.example.com
+            - Host: peer0.dfarmclient.com
               Port: 11051

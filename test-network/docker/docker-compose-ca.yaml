@@ -5,9 +5,12 @@
 
 version: '2'
 
+networks:
+  test:
+
 services:
 
-  ca_org1:
+  ca_dfarmadmin:
     image: hyperledger/fabric-ca:$IMAGE_TAG
     environment:
       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
@@ -19,9 +22,11 @@ services:
     command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
     volumes:
       - ../organizations/fabric-ca/org1:/etc/hyperledger/fabric-ca-server
-    container_name: ca_org1
+    container_name: ca_dfarmadmin
+    networks:
+      - test
 
-  ca_org2:
+  ca_yngadmin:
     image: hyperledger/fabric-ca:$IMAGE_TAG
     environment:
       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
@@ -33,7 +38,9 @@ services:
     command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
     volumes:
       - ../organizations/fabric-ca/org2:/etc/hyperledger/fabric-ca-server
-    container_name: ca_org2
+    container_name: ca_yngadmin
+    networks:
+      - test
 
   ca_orderer:
     image: hyperledger/fabric-ca:$IMAGE_TAG
@@ -48,3 +55,5 @@ services:
     volumes:
       - ../organizations/fabric-ca/ordererOrg:/etc/hyperledger/fabric-ca-server
     container_name: ca_orderer
+    networks:
+      - test

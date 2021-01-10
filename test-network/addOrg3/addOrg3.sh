@@ -30,6 +30,7 @@ function printHelp () {
   echo "    -d <delay> - delay duration in seconds (defaults to 3)"
   echo "    -s <dbtype> - the database backend to use: goleveldb (default) or couchdb"
   echo "    -i <imagetag> - the tag to be used to launch the network (defaults to \"latest\")"
+  echo "    -cai <ca_imagetag> - the image tag to be used for CA (defaults to \"${CA_IMAGETAG}\")"
   echo "    -verbose - verbose mode"
   echo
   echo "Typically, one would first generate the required certificates and "
@@ -66,13 +67,13 @@ function generateOrg3() {
     echo
 
     echo "##########################################################"
-    echo "############ Create Org1 Identities ######################"
+    echo "############ Create Dfarmclient Identities ######################"
     echo "##########################################################"
 
     set -x
     cryptogen generate --config=org3-crypto.yaml --output="../organizations"
     res=$?
-    set +x
+    { set +x; } 2>/dev/null
     if [ $res -ne 0 ]; then
       echo "Failed to generate certificates..."
       exit 1
@@ -84,17 +85,12 @@ function generateOrg3() {
   if [ "$CRYPTO" == "Certificate Authorities" ]; then
 
     fabric-ca-client version > /dev/null 2>&1
-    if [ $? -ne 0 ]; then
-      echo "Fabric CA client not found locally, downloading..."
-      cd ../..
-      curl -s -L "https://github.com/hyperledger/fabric-ca/releases/download/v1.4.4/hyperledger-fabric-ca-${OS_ARCH}-1.4.4.tar.gz" | tar xz || rc=$?
-    if [ -n "$rc" ]; then
-        echo "==> There was an error downloading the binary file."
-        echo "fabric-ca-client binary is not available to download"
-    else
-        echo "==> Done."
-      cd test-network/addOrg3/
-    fi
+    if [[ $? -ne 0 ]]; then
+      echo "ERROR! fabric-ca-client binary not found.."
+      echo
+      echo "Follow the instructions in the Fabric docs to install the Fabric Binaries:"
+      echo "https://hyperledger-fabric.readthedocs.io/en/latest/install.html"
+      exit 1
     fi
 
     echo
@@ -102,14 +98,14 @@ function generateOrg3() {
     echo "##### Generate certificates using Fabric CA's ############"
     echo "##########################################################"
 
-    IMAGE_TAG=$IMAGETAG docker-compose -f $COMPOSE_FILE_CA_ORG3 up -d 2>&1
+    IMAGE_TAG=${CA_IMAGETAG} docker-compose -f $COMPOSE_FILE_CA_ORG3 up -d 2>&1
 
     . fabric-ca/registerEnroll.sh
 
     sleep 10
 
     echo "##########################################################"
-    echo "############ Create Org1 Identities ######################"
+    echo "############ Create Dfarmclient Identities ######################"
     echo "##########################################################"
 
     createOrg3
@@ -117,7 +113,7 @@ function generateOrg3() {
   fi
 
   echo
-  echo "Generate CCP files for Org3"
+  echo "Generate CCP files for Dfarmclient"
   ./ccp-generate.sh
 }
 
@@ -129,15 +125,15 @@ function generateOrg3Definition() {
     exit 1
   fi
   echo "##########################################################"
-  echo "#######  Generating Org3 organization definition #########"
+  echo "#######  Generating Dfarmclient organization definition #########"
   echo "##########################################################"
    export FABRIC_CFG_PATH=$PWD
    set -x
-   configtxgen -printOrg Org3MSP > ../organizations/peerOrganizations/org3.example.com/org3.json
+   configtxgen -printOrg DfarmclientMSP > ../organizations/peerOrganizations/dfarmclient.com/org3.json
    res=$?
-   set +x
+   { set +x; } 2>/dev/null
    if [ $res -ne 0 ]; then
-     echo "Failed to generate Org3 config material..."
+     echo "Failed to generate Dfarmclient config material..."
      exit 1
    fi
   echo
@@ -151,7 +147,7 @@ function Org3Up () {
     IMAGE_TAG=$IMAGETAG docker-compose -f $COMPOSE_FILE_ORG3 up -d 2>&1
   fi
   if [ $? -ne 0 ]; then
-    echo "ERROR !!!! Unable to start Org3 network"
+    echo "ERROR !!!! Unable to start Dfarmclient network"
     exit 1
   fi
 }
@@ -168,7 +164,7 @@ function addOrg3 () {
   fi
 
   # generate artifacts if they don't exist
-  if [ ! -d "../organizations/peerOrganizations/org3.example.com" ]; then
+  if [ ! -d "../organizations/peerOrganizations/dfarmclient.com" ]; then
     generateOrg3
     generateOrg3Definition
   fi
@@ -180,10 +176,10 @@ function addOrg3 () {
   fi
 
   # Use the CLI container to create the configuration transaction needed to add
-  # Org3 to the network
+  # Dfarmclient to the network
   echo
   echo "###############################################################"
-  echo "####### Generate and submit config tx to add Org3 #############"
+  echo "####### Generate and submit config tx to add Dfarmclient #############"
   echo "###############################################################"
   docker exec Org3cli ./scripts/org3-scripts/step1org3.sh $CHANNEL_NAME $CLI_DELAY $CLI_TIMEOUT $VERBOSE
   if [ $? -ne 0 ]; then
@@ -193,11 +189,11 @@ function addOrg3 () {
 
   echo
   echo "###############################################################"
-  echo "############### Have Org3 peers join network ##################"
+  echo "############### Have Dfarmclient peers join network ##################"
   echo "###############################################################"
   docker exec Org3cli ./scripts/org3-scripts/step2org3.sh $CHANNEL_NAME $CLI_DELAY $CLI_TIMEOUT $VERBOSE
   if [ $? -ne 0 ]; then
-    echo "ERROR !!!! Unable to have Org3 peers join network"
+    echo "ERROR !!!! Unable to have Dfarmclient peers join network"
     exit 1
   fi
 
@@ -233,6 +229,8 @@ COMPOSE_FILE_ORG3=docker/docker-compose-org3.yaml
 COMPOSE_FILE_CA_ORG3=docker/docker-compose-ca-org3.yaml
 # default image tag
 IMAGETAG="latest"
+# default ca image tag
+CA_IMAGETAG="latest"
 # database
 DATABASE="leveldb"
 
@@ -279,6 +277,10 @@ while [[ $# -ge 1 ]] ; do
     IMAGETAG=$(go env GOARCH)"-""$2"
     shift
     ;;
+  -cai )
+    CA_IMAGETAG="$2"
+    shift
+    ;;
   -verbose )
     VERBOSE=true
     shift
@@ -297,12 +299,12 @@ done
 
 # Determine whether starting, stopping, restarting or generating for announce
 if [ "$MODE" == "up" ]; then
-  echo "Add Org3 to channel '${CHANNEL_NAME}' with '${CLI_TIMEOUT}' seconds and CLI delay of '${CLI_DELAY}' seconds and using database '${DATABASE}'"
+  echo "Add Dfarmclient to channel '${CHANNEL_NAME}' with '${CLI_TIMEOUT}' seconds and CLI delay of '${CLI_DELAY}' seconds and using database '${DATABASE}'"
   echo
 elif [ "$MODE" == "down" ]; then
   EXPMODE="Stopping network"
 elif [ "$MODE" == "generate" ]; then
-  EXPMODE="Generating certs and organization definition for Org3"
+  EXPMODE="Generating certs and organization definition for Dfarmclient"
 else
   printHelp
   exit 1

@@ -6,15 +6,15 @@
 version: '2'
 
 volumes:
-  peer0.org3.example.com:
+  peer0.dfarmclient.com:
 
 networks:
   test:
 
 services:
 
-  peer0.org3.example.com:
-    container_name: peer0.org3.example.com
+  peer0.dfarmclient.com:
+    container_name: peer0.dfarmclient.com
     image: hyperledger/fabric-peer:$IMAGE_TAG
     environment:
       #Generic peer variables
@@ -26,26 +26,24 @@ services:
       - FABRIC_LOGGING_SPEC=INFO
       #- FABRIC_LOGGING_SPEC=DEBUG
       - CORE_PEER_TLS_ENABLED=true
-      - CORE_PEER_GOSSIP_USELEADERELECTION=true
-      - CORE_PEER_GOSSIP_ORGLEADER=false
       - CORE_PEER_PROFILE_ENABLED=true
       - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
       - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
       - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
       # Peer specific variabes
-      - CORE_PEER_ID=peer0.org3.example.com
-      - CORE_PEER_ADDRESS=peer0.org3.example.com:11051
+      - CORE_PEER_ID=peer0.dfarmclient.com
+      - CORE_PEER_ADDRESS=peer0.dfarmclient.com:11051
       - CORE_PEER_LISTENADDRESS=0.0.0.0:11051
-      - CORE_PEER_CHAINCODEADDRESS=peer0.org3.example.com:11052
+      - CORE_PEER_CHAINCODEADDRESS=peer0.dfarmclient.com:11052
       - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:11052
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org3.example.com:11051
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org3.example.com:11051
-      - CORE_PEER_LOCALMSPID=Org3MSP
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.dfarmclient.com:11051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.dfarmclient.com:11051
+      - CORE_PEER_LOCALMSPID=DfarmclientMSP
     volumes:
         - /var/run/:/host/var/run/
-        - ../../organizations/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/msp:/etc/hyperledger/fabric/msp
-        - ../../organizations/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/tls:/etc/hyperledger/fabric/tls
-        - peer0.org3.example.com:/var/hyperledger/production
+        - ../../organizations/peerOrganizations/dfarmclient.com/peers/peer0.dfarmclient.com/msp:/etc/hyperledger/fabric/msp
+        - ../../organizations/peerOrganizations/dfarmclient.com/peers/peer0.dfarmclient.com/tls:/etc/hyperledger/fabric/tls
+        - peer0.dfarmclient.com:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
     command: peer node start
     ports:
@@ -64,13 +62,13 @@ services:
       - FABRIC_LOGGING_SPEC=INFO
       #- FABRIC_LOGGING_SPEC=DEBUG
       - CORE_PEER_ID=Org3cli
-      - CORE_PEER_ADDRESS=peer0.org3.example.com:11051
-      - CORE_PEER_LOCALMSPID=Org3MSP
+      - CORE_PEER_ADDRESS=peer0.dfarmclient.com:11051
+      - CORE_PEER_LOCALMSPID=DfarmclientMSP
       - CORE_PEER_TLS_ENABLED=true
-      - CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/tls/server.crt
-      - CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/tls/server.key
-      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/tls/ca.crt
-      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/peerOrganizations/org3.example.com/users/Admin@org3.example.com/msp
+      - CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/peerOrganizations/dfarmclient.com/peers/peer0.dfarmclient.com/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/peerOrganizations/dfarmclient.com/peers/peer0.dfarmclient.com/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/peerOrganizations/dfarmclient.com/peers/peer0.dfarmclient.com/tls/ca.crt
+      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations/peerOrganizations/dfarmclient.com/users/Admin@dfarmclient.com/msp
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
     command: /bin/bash
     volumes:
@@ -79,6 +77,6 @@ services:
         - ../../organizations:/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations
         - ../../scripts:/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/
     depends_on:
-      - peer0.org3.example.com
+      - peer0.dfarmclient.com
     networks:
       - test
